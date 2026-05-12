@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TypeScript & AWS Lambda 実績作りプロジェクト計画書
 
 本ドキュメントは、TypeScriptとAWS Lambdaを用いた「ニュース要約通知Bot」の開発計画をまとめたものです。1ヶ月という短期間で、AWSの無料枠を最大限に活用しつつ、モダンなエンジニアリングスキルを証明できる構成としています。
@@ -208,3 +209,6 @@ const RETRY_CONFIG = {
 5. **保守性：** TypeScriptによる厳密な型定義・構造化ログ・自動テストの導入
 
 ---
+=======
+# serverless-news-summarizer
+>>>>>>> c5f88e28cdf7276eb0a76094b1dff846add916c4

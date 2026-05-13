@@ -48,3 +48,34 @@ export const getNewArticles = async (): Promise<Article[]> => {
 
   return articlesToProcess;
 };
+
+/**
+ * 致命的エラーをSlackへアラート通知する
+ */
+export const sendAlert = async (
+  error: unknown,
+  webhookUrl: string
+): Promise<void> => {
+  const message = {
+    text: [
+      '🚨 *Serverless News Summarizer - エラー発生*',
+      `> ${String(error)}`,
+      `発生時刻: ${new Date().toISOString()}`,
+    ].join('\n'),
+  };
+
+  try {
+    await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(message),
+    });
+  } catch (alertError) {
+    console.log(JSON.stringify({
+      level: 'ERROR',
+      message: 'Failed to send alert to Slack',
+      error: String(alertError),
+      timestamp: new Date().toISOString(),
+    }));
+  }
+};

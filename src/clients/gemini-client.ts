@@ -28,8 +28,8 @@ export const summarizeArticles = async (
     apiKey: string
 ): Promise<SummarizedArticle[]> => {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // gemini-1.5-flash を使用
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    // gemini-2.5-flash を使用
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const results: SummarizedArticle[] = [];
 

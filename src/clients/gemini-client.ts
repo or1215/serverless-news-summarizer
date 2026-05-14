@@ -28,8 +28,8 @@ export const summarizeArticles = async (
     apiKey: string
 ): Promise<SummarizedArticle[]> => {
     const genAI = new GoogleGenerativeAI(apiKey);
-    // gemini-2.5-flash を使用
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    // gemini-2.5-flash-lite を使用
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     const results: SummarizedArticle[] = [];
 
@@ -38,6 +38,17 @@ export const summarizeArticles = async (
             const summary = await summarizeWithRetry(model, article);
             results.push({ ...article, summary });
         } catch (error) {
+            const is429 = String(error).includes('429');
+            if (is429) {
+                // 残り全記事をスキップ（今日の枠を使い切った）
+                console.log(JSON.stringify({
+                    level: 'WARN',
+                    message: 'Daily quota exhausted. Stopping summarization for today.',
+                    processedCount: results.length,
+                    timestamp: new Date().toISOString(),
+                }));
+                break;
+            }
             // 特定の記事で失敗してもスキップして続行
             console.log(JSON.stringify({
                 level: 'WARN',
@@ -45,7 +56,7 @@ export const summarizeArticles = async (
                 articleUrl: article.url,
                 error: String(error),
                 timestamp: new Date().toISOString(),
-            }));
+            }));    
         }
     }
 

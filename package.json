@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.1045.0",
+    "@aws-sdk/client-ssm": "^3.1046.0",
     "@aws-sdk/lib-dynamodb": "^3.1045.0",
+    "@google/generative-ai": "^0.24.1",
     "aws-cdk-lib": "^2.253.1",
     "constructs": "^10.6.0",
     "rss-parser": "^3.13.0"

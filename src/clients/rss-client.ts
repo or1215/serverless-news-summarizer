@@ -19,13 +19,12 @@ const parser = new Parser();
  */
 export const fetchArticles = async (): Promise<Article[]> => {
   const results: Article[] = [];
-
   for (const source of RSS_SOURCES) {
     try {
       const feed = await parser.parseURL(source.url);
       const articles = (feed.items ?? [])
-        .filter((item) => item.link && item.title)
-        .map((item) => ({
+        .filter((item: Parser.Item) => item.link && item.title)
+        .map((item: Parser.Item) => ({
           url: item.link!,
           title: item.title!,
           content: item.contentSnippet ?? item.content ?? '',

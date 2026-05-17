@@ -21,19 +21,28 @@ export class NewsSummarizerStack extends cdk.Stack {
       partitionKey: { name: 'url', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // 無料枠内で運用
       timeToLiveAttribute: 'ttl', // 古いレコードを自動削除
-      removalPolicy: cdk.RemovalPolicy.DESTROY, // 開発中のみ。本番はRETAIN推奨
+      removalPolicy: cdk.RemovalPolicy.DESTROY, 
+    });
+
+    // S3バケット（静的サイトホスティング用）
+    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
+      bucketName: `news-summarizer-site-${this.account}`,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // CloudFront経由のみアクセス許可
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
     
     // Lambda関数：Node.js 22環境
     const summarizerFn = new lambda_nodejs.NodejsFunction(this, 'SummarizerFunction', {
       runtime: lambda.Runtime.NODEJS_22_X,
       entry: 'src/handlers/index.ts', // エントリポイントを直接指定
-      handler: 'handler',            // 以前と同様
+      handler: 'handler',            
       timeout: cdk.Duration.seconds(60),
       memorySize: 256,
       environment: {
         REGION: this.region,
-        ARTICLES_TABLE_NAME: articlesTable.tableName, // 環境変数を確実に渡す
+        ARTICLES_TABLE_NAME: articlesTable.tableName, 
+        SITE_BUCKET_NAME: siteBucket.bucketName,
       },
       bundling: {
         minify: true, // コードを軽量化
@@ -43,14 +52,6 @@ export class NewsSummarizerStack extends cdk.Stack {
           '.css': 'text', // CSSファイルをテキストとしてバンドル
         },
       },
-    });
-
-    // S3バケット（静的サイトホスティング用）
-    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
-      bucketName: `news-summarizer-site-${this.account}`,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL, // CloudFront経由のみアクセス許可
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
     });
 
     // CloudFrontディストリビューション

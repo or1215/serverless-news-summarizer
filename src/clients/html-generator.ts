@@ -1,6 +1,5 @@
 import { SummarizedArticle } from './gemini-client'; // 既存の型定義をインポート
-import * as fs from 'fs';
-import * as path from 'path';
+import systemStyles from './style.css';
 
 /**
  * 要約記事一覧からHTMLページを生成する
@@ -17,9 +16,6 @@ export const generateHtml = (articles: SummarizedArticle[]): string => {
     timeZone: 'Asia/Tokyo',
   });
 
-  // CSSファイルを読み込む
-  const cssPath = path.join(__dirname, 'style.css');
-  const systemStyles = fs.readFileSync(cssPath, 'utf-8');
 
   // 記事データを一つずつHTMLのカード形式に変換する
   const cards = articles.map((article, index) => renderArticleCard(article, index)).join('');

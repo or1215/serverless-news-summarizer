@@ -38,6 +38,10 @@ export class NewsSummarizerStack extends cdk.Stack {
       bundling: {
         minify: true, // コードを軽量化
         sourceMap: true, // エラー時に元のコードの場所を特定しやすくする
+        loader: {
+          '.ts': 'ts', // TypeScriptファイルを適切に処理
+          '.css': 'text', // CSSファイルをテキストとしてバンドル
+        },
       },
     });
 

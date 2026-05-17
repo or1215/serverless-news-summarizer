@@ -3,6 +3,8 @@ import { getSecrets } from '../clients/ssm-client';
 import { summarizeArticles } from '../clients/gemini-client';
 import { sendDigest } from '../clients/slack-client';
 import { markArticlesAsSent } from '../clients/dynamodb-client';
+import { generateHtml } from '../clients/html-generator';
+import { uploadHtml } from '../clients/s3-client';
 
 export const handler = async (): Promise<void> => {
   console.log(JSON.stringify({
@@ -14,13 +16,12 @@ export const handler = async (): Promise<void> => {
   let slackUrl = '';
 
   try {
-    // 1. シークレット取得
+    // シークレット取得
     const secrets = await getSecrets();
     slackUrl = secrets.slackWebhookUrl;
 
-    // 2. 未送信記事の取得
+    // 未送信記事の取得
     const articles = await getNewArticles();
-
     if (articles.length === 0) {
       console.log(JSON.stringify({
         level: 'INFO',
@@ -30,9 +31,8 @@ export const handler = async (): Promise<void> => {
       return;
     }
 
-    // 3. Gemini APIで要約
+    // Gemini APIで要約
     const summarized = await summarizeArticles(articles, secrets.geminiApiKey);
-
     if (summarized.length === 0) {
       console.log(JSON.stringify({
         level: 'WARN',
@@ -42,12 +42,11 @@ export const handler = async (): Promise<void> => {
       return;
     }
 
-    // 4. Slackへダイジェスト通知
+    // Slackへダイジェスト通知
     await sendDigest(summarized, secrets.slackWebhookUrl);
 
-    // 5. 送信済みをDynamoDBに記録（通知成功後に実行）
+    // 送信済みをDynamoDBに記録（通知成功後に実行）
     await markArticlesAsSent(summarized);
-
     console.log(JSON.stringify({
       level: 'INFO',
       message: 'Digest sent successfully',
@@ -55,6 +54,17 @@ export const handler = async (): Promise<void> => {
       timestamp: new Date().toISOString(),
     }));
 
+    /* HTML生成とS3アップロード */
+    // HTMLの生成
+    const html = generateHtml(summarized);
+    // 生成したHTMLをS3バケットへアップロード（上書き）
+    await uploadHtml(html);
+    console.log(JSON.stringify({
+      level: 'INFO',
+      message: 'HTML generated and uploaded successfully',
+      timestamp: new Date().toISOString(),
+    }));
+    
   } catch (error) {
     console.log(JSON.stringify({
       level: 'ERROR',
@@ -62,7 +72,6 @@ export const handler = async (): Promise<void> => {
       error: String(error),
       timestamp: new Date().toISOString(),
     }));
-
     // 致命的エラーはSlackへアラート送信
     if (slackUrl) {
       await sendAlert(error, slackUrl);
@@ -70,3 +79,4 @@ export const handler = async (): Promise<void> => {
     throw error;
   }
 };
+

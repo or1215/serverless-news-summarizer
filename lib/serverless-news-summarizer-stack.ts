@@ -88,6 +88,20 @@ export class NewsSummarizerStack extends cdk.Stack {
     // LambdaにS3への書き込み権限を付与
     siteBucket.grantPut(summarizerFn);
 
+    // S3バケットに対して、CloudFrontからのオブジェクト読み取りを明示的に許可
+    siteBucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: [siteBucket.arnForObjects('*')],
+        principals: [new iam.ServicePrincipal('cloudfront.amazonaws.com')],
+        conditions: {
+          ArnEquals: {
+            'AWS:SourceArn': `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
+          },
+        },
+      })
+    );
+
     /* イベント設定 */
     // EventBridge：起動するスケジュール設定
     new events.Rule(this, 'DailyTrigger', {
@@ -104,6 +118,7 @@ export class NewsSummarizerStack extends cdk.Stack {
       value: `https://${distribution.distributionDomainName}`,
       description: '公開サイトURL',
     });
+
 
   }
 

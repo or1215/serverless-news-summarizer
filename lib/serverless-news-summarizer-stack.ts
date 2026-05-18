@@ -10,6 +10,16 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import { Construct } from 'constructs';
 
+/**
+ * ニュース要約サービスのCDKスタック
+ * - Lambda関数：ニュース記事の取得と要約処理を実行
+ * - DynamoDBテーブル：送信済み記事の管理
+ * - S3バケット：静的サイトホスティング用
+ * - CloudFrontディストリビューション：サイトの高速配信とHTTPS対応
+ * - EventBridgeルール：Lambda関数の定期実行スケジュール設定
+ * - IAMポリシー：Lambda関数に必要な権限を付与
+ * - CDK Outputs：デプロイ後にサイトURLをコンソールに表示
+ */
 export class NewsSummarizerStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -119,7 +129,6 @@ export class NewsSummarizerStack extends cdk.Stack {
       value: `https://${distribution.distributionDomainName}`,
       description: '公開サイトURL',
     });
-
 
   }
 

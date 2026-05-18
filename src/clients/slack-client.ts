@@ -36,34 +36,35 @@ const buildBlocks = (articles: SummarizedArticle[]): object[] => {
     // ヘッダーと概要セクション
     const blocks: object[] = [
         {
-        type: 'header',
-        text: { type: 'plain_text', text: '📰 Tech News Digest', emoji: true },
+            type: 'header',
+            text: { type: 'plain_text', text: '📰 Tech News Digest', emoji: true },
         },
         {
-        type: 'section',
-        text: {
-            type: 'mrkdwn',
-            text: `*${today}*　｜　新着 *${articles.length}* 件`,
-        },
+            type: 'section',
+            text: {
+                type: 'mrkdwn',
+                text: `*${today}*　｜　新着 *${articles.length}* 件`,
+            },
         },
         { type: 'divider' },
     ];
 
     // 記事ごとにセクションブロックを追加
     articles.forEach((article, index) => {
+        // 数字を絵文字に変換（10以上は数字のまま） ←　今後の対応が必要
         const emoji = NUMBER_EMOJIS[index] ?? `${index + 1}.`;
 
         blocks.push(
             {
                 type: 'section',
                 text: {
-                type: 'mrkdwn',
-                text: `${emoji}  *${article.title}*\n📝 ${article.summary}`,
+                    type: 'mrkdwn',
+                    text: `${emoji}  *${article.title}*\n📝 ${article.summary}`,
                 },
                 accessory: {
-                type: 'button',
-                text: { type: 'plain_text', text: '元記事を読む', emoji: true },
-                url: article.url,
+                    type: 'button',
+                    text: { type: 'plain_text', text: '元記事を読む', emoji: true },
+                    url: article.url,
                 },
             },
             { type: 'divider' }

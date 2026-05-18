@@ -11,7 +11,6 @@
 | **名称** | Serverless News Summarizer |
 | **目的** | 特定のニュースサイトや技術ブログの更新を自動検知し、AIで要約してSlackへ通知する |
 | **期間** | 1ヶ月 |
-| **予算** | 0円（AWS無料枠 ＋ 各種API無料枠） |
 
 ---
 
@@ -42,7 +41,6 @@ AWS Lambda (メイン処理)
     ├─ 4. Gemini APIで各記事を要約（逐次 or 並列）
     ├─ 5. Slack Block Kit形式でダイジェスト通知（1日1回）
     └─ 6. 送信済みURLをDynamoDBに書き込み
-         │
          ├─ DynamoDB（送信済みURL管理）
          ├─ SSM Parameter Store（APIキー・Webhook URL）
          └─ CloudWatch Logs（実行ログ・エラーログ）
@@ -137,23 +135,6 @@ const RETRY_CONFIG = {
 
 新着記事が0件の場合は**Slackへの通知をスキップ**する（不要なノイズを防ぐ）。
 
-#### Geminiへの要約プロンプト設計
-
-```
-以下の記事を日本語で100〜150文字で要約してください。
-技術的な内容はそのまま残し、体言止めで簡潔にまとめてください。
-
-タイトル: {title}
-本文: {content}
-```
-
-### 4-4. シークレット管理仕様
-
-| シークレット | SSMパス | 種別 |
-| :--- | :--- | :--- |
-| Gemini APIキー | `/news-summarizer/gemini-api-key` | SecureString |
-| Slack Webhook URL | `/news-summarizer/slack-webhook-url` | SecureString |
-
 ---
 
 ## 5. 実績としてアピールするポイント
@@ -162,6 +143,6 @@ const RETRY_CONFIG = {
 2. **IaCの実践：** 手動設定を排除し、すべてAWS CDKによるコード管理を実施
 3. **実用的な設計：** 単なる通知にとどまらず、DBによる重複排除・上限制御・AIによる情報加工・リトライ処理を実装
 4. **UXへの配慮：** Slack Block KitによるリッチなUIと、不要通知ゼロ件時のスキップ処理
-5. **保守性：** TypeScriptによる厳密な型定義・構造化ログ・自動テストの導入
+5. **保守性：** TypeScriptによる厳密な型定義・構造化ログ・自動テストの導入・
 
 ---

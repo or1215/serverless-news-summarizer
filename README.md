@@ -203,8 +203,8 @@ SERVERLESS-NEWS-SUMMARIZER
  
 | # | テスト名 | 前提条件 | 期待する結果 |
 | :--- | :--- | :--- | :--- |
-| 1 | RSS取得が失敗した場合はエラーをスローする | `fetchArticles` がNetworkErrorをスロー | エラーがそのままスローされる |
-| 2 | DynamoDB参照が失敗した場合はエラーをスローする | `filterUnsentArticles` がDynamoDB Errorをスロー | エラーがそのままスローされる |
+| 7 | RSS取得が失敗した場合はエラーをスローする | `fetchArticles` がNetworkErrorをスロー | エラーがそのままスローされる |
+| 8 | DynamoDB参照が失敗した場合はエラーをスローする | `filterUnsentArticles` がDynamoDB Errorをスロー | エラーがそのままスローされる |
 
 ## カバレッジ対象
  
